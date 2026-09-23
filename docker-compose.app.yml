@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  app:
+    build: ./app
+    container_name: typing-game-app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"   # game UI + /metrics — Prometheus on Instance 2 will scrape this
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: typinggame
+      DB_USER: typinggame
+      DB_PASSWORD: ${DB_PASSWORD:-typinggame}
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16-alpine
+    container_name: typing-game-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: typinggame
+      POSTGRES_USER: typinggame
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-typinggame}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # No published port — only the app container talks to it, over the compose network
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"   # host metrics — Instance 2's Prometheus scrapes this too
+
+volumes:
+  pgdata:
