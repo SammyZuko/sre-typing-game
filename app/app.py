@@ -1,5 +1,4 @@
 import os
-import random
 import time
 from datetime import datetime, timezone
 
@@ -10,6 +9,7 @@ from prometheus_client import (
     Histogram,
     generate_latest,
 )
+from wonderwords import RandomSentence
 import psycopg2
 from psycopg2 import pool
 
@@ -24,13 +24,7 @@ DB_NAME = os.environ.get("DB_NAME", "typinggame")
 DB_USER = os.environ.get("DB_USER", "typinggame")
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "typinggame")
 
-WORD_LISTS = [
-    "the quick brown fox jumps over the lazy dog",
-    "site reliability engineering keeps systems fast and available",
-    "prometheus scrapes metrics while grafana renders dashboards",
-    "practice makes progress not perfection every single day",
-    "observability means knowing why a system behaves the way it does",
-]
+sentence_generator = RandomSentence()
 
 # ---------------------------------------------------------------------------
 # Prometheus metrics
@@ -121,7 +115,9 @@ def index():
 @app.route("/api/prompt")
 def api_prompt():
     GAME_SESSIONS_STARTED.inc()
-    return jsonify({"prompt": random.choice(WORD_LISTS)})
+    # Generate 2-3 sentences strung together so prompts aren't too short
+    prompt = " ".join(sentence_generator.sentence() for _ in range(2))
+    return jsonify({"prompt": prompt})
 
 
 @app.route("/api/score", methods=["POST"])
