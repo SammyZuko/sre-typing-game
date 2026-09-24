@@ -6,7 +6,7 @@ services:
     container_name: typing-game-app
     restart: unless-stopped
     ports:
-      - "5000:5000"   # game UI + /metrics — Prometheus on Instance 2 will scrape this
+      - "5000:5000"   # kept for Prometheus (Instance 2) to scrape /metrics directly
     environment:
       DB_HOST: db
       DB_PORT: 5432
@@ -35,5 +35,21 @@ services:
     ports:
       - "9100:9100"   # host metrics — Instance 2's Prometheus scrapes this too
 
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile.app:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
 volumes:
   pgdata:
+  caddy_data:
+  caddy_config:

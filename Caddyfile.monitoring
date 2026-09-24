@@ -1,0 +1,3 @@
+zuko-monitoring.duckdns.org {
+	reverse_proxy grafana:3000
+}

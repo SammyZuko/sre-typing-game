@@ -17,10 +17,12 @@ services:
     restart: unless-stopped
     environment:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-changeme}
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Viewer"
     volumes:
       - grafana_data:/var/lib/grafana
     ports:
-      - "3000:3000"   # public — this is what you'll share
+      - "3000:3000"   # kept for direct access if needed; Caddy fronts this on 443
 
   node-exporter:
     image: prom/node-exporter:latest
@@ -29,6 +31,22 @@ services:
     ports:
       - "9100:9100"
 
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile.monitoring:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - grafana
+
 volumes:
   prom_data:
   grafana_data:
+  caddy_data:
+  caddy_config:
