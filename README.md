@@ -1,4 +1,4 @@
-# Typing Speed Game — Monitored on AWS
+# Typing Speed Game  Monitored on AWS
 
 A small Flask-based typing speed game, instrumented with Prometheus metrics
 and visualized in Grafana, deployed across two AWS free-tier EC2 instances.
@@ -27,17 +27,11 @@ and visualized in Grafana, deployed across two AWS free-tier EC2 instances.
                   └────────────────────────┘
 ```
 
-- **Instance 1** runs the game (Flask + Gunicorn), a Postgres container for
+- Instance 1 runs the game (Flask + Gunicorn), a Postgres container for
   scores, and node-exporter for host metrics.
-- **Instance 2** runs Prometheus (scraping Instance 1 over its private IP)
-  and Grafana (dashboards, public-facing).
-
-## Why two instances
-
-AWS's free tier gives 750 free hours/month per instance *type*. Running the
-app on a `t2.micro` and monitoring on a `t3.micro` (or vice versa) keeps each
-comfortably inside its own free allotment.
-
+- Instance 2 runs Prometheus (scraping Instance 1 over its private IP)
+  and Grafana (dashboards, public-facing)
+  
 ## Local development
 
 ```bash
@@ -51,7 +45,7 @@ Visit http://localhost:5000
 ## Deploying to AWS
 
 1. Launch two EC2 instances (see `docs/` or project notes for security group
-   rules). Note Instance 1's **private IP**.
+   rules). Note Instance 1's private IP.
 2. On Instance 1:
    ```bash
    git clone <this repo>
@@ -77,7 +71,7 @@ Visit http://localhost:5000
 | `DB_PASSWORD` | app, db | `typinggame` |
 | `GRAFANA_ADMIN_PASSWORD` | grafana | `changeme` |
 
-Set real values in a `.env` file on each instance — don't commit them.
+Set real values in a `.env` file on each instance  don't commit them.
 
 ## Metrics exposed at `/metrics`
 
@@ -92,9 +86,3 @@ Set real values in a `.env` file on each instance — don't commit them.
 Defined in `monitoring/alerts.yml`:
 - **AppDown** — fires if Prometheus can't scrape the app for 1 minute
 - **HighRequestLatency** — fires if P95 latency exceeds 1s for 5 minutes
-
-## Teardown
-
-This project targets AWS free-tier eligibility. To avoid charges, terminate
-both EC2 instances (and release Elastic IPs) once you've captured your
-demo/screenshots, unless you intend to keep it running long-term.
