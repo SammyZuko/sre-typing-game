@@ -14,9 +14,6 @@ scrape_configs:
     static_configs:
       - targets: ["172.31.23.253:9100"]
 
-  - job_name: "node-exporter-monitoring-host"
-    static_configs:
-      - targets: ["localhost:9100"]
 
   - job_name: "prometheus"
     static_configs:
